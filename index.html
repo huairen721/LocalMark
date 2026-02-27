@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>LocalMark</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            /* 紫色系配色 */
+            --primary-purple: #7B6AD9;
+            --primary-purple-hover: #6B5AC9;
+            --primary-purple-light: #9B8AE9;
+            --bg-lavender: #E8E0F5;
+            --bg-lavender-light: #F0EBFA;
+            --surface-white: #FFFFFF;
+            --text-primary: #2D2B55;
+            --text-secondary: #6B6694;
+            --border-purple: #D4CCE8;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            --shadow-sm: 0 2px 8px rgba(123, 106, 217, 0.08);
+            --shadow-md: 0 4px 16px rgba(123, 106, 217, 0.12);
+            --shadow-lg: 0 8px 32px rgba(123, 106, 217, 0.16);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, var(--bg-lavender) 0%, var(--bg-lavender-light) 100%);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-layout {
+            display: flex;
+            height: 100vh;
+            gap: 24px;
+            padding: 24px;
+        }
+
+        /* 左侧控制面板 */
+        .control-panel {
+            width: 380px;
+            min-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .control-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .control-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .control-panel::-webkit-scrollbar-thumb {
+            background: var(--border-purple);
+            border-radius: 3px;
+        }
+
+        .header-card {
+            background: var(--surface-white);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-purple);
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 4px 8px;
+            background: var(--bg-lavender);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+
+        .github-link:hover {
+            background: var(--primary-purple);
+            color: white;
+        }
+
+        .control-card {
+            background: var(--surface-white);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-purple);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-purple);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-box {
+            border: 2px dashed var(--primary-purple-light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            background: var(--bg-lavender-light);
+            transition: all 0.2s;
+        }
+
+        .file-upload-box:hover {
+            border-color: var(--primary-purple);
+            background: var(--bg-lavender);
+        }
+
+        .file-upload-box .material-icons-round {
+            font-size: 28px;
+            color: var(--primary-purple);
+            margin-bottom: 4px;
+        }
+
+        .file-upload-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .file-count {
+            font-size: 0.7rem;
+            color: var(--primary-purple);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .compact-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border-purple);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-family: inherit;
+            background: var(--surface-white);
+            color: var(--text-primary);
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .compact-input:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(123, 106, 217, 0.1);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .control-label .material-icons-round {
+            font-size: 14px;
+            color: var(--primary-purple);
+        }
+
+        .purple-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: var(--bg-lavender);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .purple-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-purple);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(123, 106, 217, 0.3);
+            transition: transform 0.1s;
+        }
+
+        .purple-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .color-picker-compact {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .color-input {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            overflow: hidden;
+            padding: 0;
+            background: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .color-value {
+            font-size: 0.75rem;
+            font-family: 'Roboto Mono', monospace;
+            color: var(--text-secondary);
+            background: var(--bg-lavender-light);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-purple);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary-purple);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-purple-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-lavender);
+            color: var(--primary-purple);
+            border-color: var(--primary-purple);
+        }
+
+        .btn .material-icons-round {
+            font-size: 16px;
+        }
+
+        /* 右侧预览区域 */
+        .preview-panel {
+            flex: 1;
+            min-width: 0;
+            background: var(--surface-white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-purple);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-purple);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-lavender-light);
+        }
+
+        .preview-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preview-stats {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: white;
+            padding: 4px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-purple);
+        }
+
+        /* 图片网格 - 动态调整大小 */
+        #graph {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+            align-content: start;
+            /* 动态列数由JS设置 */
+            grid-template-columns: 1fr;
+        }
+
+        #graph::-webkit-scrollbar {
+            width: 8px;
+        }
+        #graph::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #graph::-webkit-scrollbar-thumb {
+            background: var(--border-purple);
+            border-radius: 4px;
+        }
+
+        /* 图片卡片 - 自适应填充 */
+        .image-card {
+            background: var(--surface-white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-purple);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+            border-color: var(--primary-purple-light);
+        }
+
+        .image-card::after {
+            content: '点击下载';
+            position: absolute;
+            inset: 0;
+            background: rgba(123, 106, 217, 0.9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.2s;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+        }
+
+        .image-card:hover::after {
+            opacity: 1;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            background: var(--bg-lavender-light);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .canvas-wrapper canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .image-info {
+            padding: 12px 16px;
+            background: white;
+            border-top: 1px solid var(--border-purple);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .image-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .image-dimensions {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: var(--bg-lavender-light);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            text-align: center;
+            height: 100%;
+            min-height: 400px;
+        }
+
+        .empty-state .material-icons-round {
+            font-size: 64px;
+            color: var(--border-purple);
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .control-panel {
+                width: 100%;
+                min-width: auto;
+                max-height: 40vh;
+            }
+            .preview-panel {
+                min-height: 50vh;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .image-card {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-layout">
+    <!-- 左侧控制面板 -->
+    <div class="control-panel">
+        <div class="header-card">
+            <h1>
+                <span class="material-icons-round" style="font-size: 24px;">water_drop</span>
+                离线水印工具
+            </h1>
+            <p class="subtitle">
+                利用浏览器本地API为图片加水印，无网络请求。适合身份证、护照等敏感证件加水印。
+            </p>
+            <a href="https://github.com/jzsn2018/offline-photo-watermark" target="_blank" class="github-link">
+                <span class="material-icons-round" style="font-size: 14px;">star</span>
+                GitHub
+            </a>
+        </div>
+
+        <div class="control-card">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <span>选择图片</span>
+            </div>
+            <div class="file-input-wrapper">
+                <input type="file" id="image" multiple accept="image/png,image/jpeg,image/gif">
+                <div class="file-upload-box">
+                    <div class="material-icons-round">cloud_upload</div>
+                    <div class="file-upload-text">点击或拖拽上传</div>
+                    <div class="file-count" id="file-count">未选择文件</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-card">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <span>水印文字</span>
+            </div>
+            <input type="text" id="text" class="compact-input" placeholder="例如：仅供实名认证使用" autocomplete="off">
+        </div>
+
+        <div class="control-card">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <span>样式调整</span>
+            </div>
+            
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label class="control-label">
+                        <span class="material-icons-round">palette</span>
+                        颜色
+                    </label>
+                    <div class="color-picker-compact">
+                        <input type="color" id="color" class="color-input" value="#ffffff">
+                        <span class="color-value" id="color-value">#FFFFFF</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">
+                        <span class="material-icons-round">opacity</span>
+                        透明度
+                    </label>
+                    <input type="range" id="alpha" class="purple-slider" min="0" max="1" step="0.05" value="0.3">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">
+                        <span class="material-icons-round">space_bar</span>
+                        间隔
+                    </label>
+                    <input type="range" id="space" class="purple-slider" min="1" max="8" step="0.2" value="1.5">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">
+                        <span class="material-icons-round">format_size</span>
+                        字号
+                    </label>
+                    <input type="range" id="size" class="purple-slider" min="0.5" max="3" step="0.05" value="0.8">
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button onclick="downloadAllPic()" class="btn btn-primary" id="download-all-btn" disabled>
+                <span class="material-icons-round">download</span>
+                下载全部
+            </button>
+            <button onclick="clearAll()" class="btn btn-secondary">
+                <span class="material-icons-round">delete</span>
+                清空
+            </button>
+        </div>
+    </div>
+
+    <!-- 右侧预览区域 -->
+    <div class="preview-panel">
+        <div class="preview-header">
+            <div class="preview-title">
+                <span class="material-icons-round" style="color: var(--primary-purple);">photo_library</span>
+                图片预览
+            </div>
+            <div class="preview-stats" id="preview-stats">0 张图片</div>
+        </div>
+        
+        <div id="graph">
+            <div class="empty-state">
+                <span class="material-icons-round">image</span>
+                <p>暂无图片，请从左侧上传</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const inputItems = ['text', 'color', 'alpha', 'space', 'size'];
+    const configInputSetting = {};
+    let allCanvas = [];
+    
+    const $ = (sel) => document.querySelector(sel);
+
+    // 根据图片数量更新网格布局
+    const updateGridLayout = () => {
+        const graph = $('#graph');
+        const count = allCanvas.length;
+        
+        if (count === 0) {
+            graph.style.gridTemplateColumns = '1fr';
+            return;
+        }
+        
+        // 计算列数：1张=1列，2张=2列，3张=3列，4张=2列(2x2)，5-6张=3列，更多=自动适配
+        let columns;
+        if (count === 1) {
+            columns = 1;
+        } else if (count === 2) {
+            columns = 2;
+        } else if (count === 3) {
+            columns = 3;
+        } else if (count === 4) {
+            columns = 2; // 2x2 网格
+        } else if (count <= 6) {
+            columns = 3;
+        } else if (count <= 9) {
+            columns = 3;
+        } else {
+            columns = 4;
+        }
+        
+        // 设置网格列数，每列等宽
+        graph.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+        
+        // 如果只有1张图，让它占满整个高度
+        if (count === 1) {
+            graph.style.gridAutoRows = 'minmax(0, 1fr)';
+        } else {
+            graph.style.gridAutoRows = 'auto';
+        }
+    };
+
+    const dataURItoBlob = (dataURI) => {
+        const binStr = atob(dataURI.split(',')[1]);
+        const len = binStr.length;
+        const arr = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            arr[i] = binStr.charCodeAt(i);
+        }
+        return new Blob([arr], { type: 'image/png' });
+    };
+
+    const generateFileName = (fileName) => {
+        const pad = (n) => n < 10 ? '0' + n : n;
+        const d = new Date();
+        const timeStr = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+        const baseName = fileName.replace(/\.[^/.]+$/, "");
+        return `${baseName}_${timeStr}.png`;
+    };
+
+    const redrawCanvas = (canvas, img) => {
+        const w = canvas.width;
+        const h = canvas.height;
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+    };
+
+    const makeStyle = () => {
+        const match = configInputSetting.color.value.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+        return `rgba(${parseInt(match[1], 16)},${parseInt(match[2], 16)},${parseInt(match[3], 16)},${configInputSetting.alpha.value})`;
+    };
+
+    const drawText = (canvas, img) => {
+        redrawCanvas(canvas, img);
+        if (!canvas) return;
+
+        const textSize = configInputSetting.size.value * Math.max(15, (Math.min(canvas.width, canvas.height)) / 25);
+        const textCtx = canvas.getContext('2d');
+        
+        textCtx.rotate(45 * Math.PI / 180);
+        textCtx.fillStyle = makeStyle();
+        textCtx.font = `bold ${textSize}px -apple-system,"Helvetica Neue",Helvetica,Arial,"PingFang SC","Hiragino Sans GB","WenQuanYi Micro Hei",sans-serif`;
+        
+        const width = textCtx.measureText(configInputSetting.text.value).width;
+        const step = Math.sqrt((Math.pow(canvas.width, 2)) + (Math.pow(canvas.height, 2)));
+        const margin = textCtx.measureText('啊').width;
+        const x = Math.ceil(step / (width + margin));
+        const y = Math.ceil((step / (configInputSetting.space.value * textSize)) / 2);
+
+        for (let i = 0; i <= x; i++) {
+            for (let j = -y; j <= y; j++) {
+                textCtx.fillText(configInputSetting.text.value, (width + margin) * i, configInputSetting.space.value * textSize * j);
+            }
+        }
+    };
+
+    const readFile = (file) => {
+        if (!file) return;
+        
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                allCanvas.push({ img, canvas, fileName: file.name, width: img.width, height: img.height });
+                
+                drawText(canvas, img);
+                addImageToGrid(canvas, file.name, img.width, img.height);
+                updateUI();
+                updateGridLayout(); // 更新网格布局
+            };
+            img.src = fileReader.result;
+        };
+        fileReader.readAsDataURL(file);
+    };
+
+    const addImageToGrid = (canvas, fileName, width, height) => {
+        const graph = $('#graph');
+        
+        if (allCanvas.length === 1) {
+            graph.innerHTML = '';
+        }
+
+        const card = document.createElement('div');
+        card.className = 'image-card';
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'canvas-wrapper';
+        
+        const canvasClone = document.createElement('canvas');
+        canvasClone.width = canvas.width;
+        canvasClone.height = canvas.height;
+        canvasClone.getContext('2d').drawImage(canvas, 0, 0);
+        
+        wrapper.appendChild(canvasClone);
+        
+        const info = document.createElement('div');
+        info.className = 'image-info';
+        info.innerHTML = `
+            <div class="image-name" title="${fileName}">${fileName}</div>
+            <div class="image-dimensions">${width}×${height}</div>
+        `;
+        
+        card.appendChild(wrapper);
+        card.appendChild(info);
+        
+        card.addEventListener('click', () => {
+            downloadCanvasAsImage(canvas, fileName);
+        });
+        
+        graph.appendChild(card);
+    };
+
+    const downloadCanvasAsImage = (canvas, fileName) => {
+        const link = document.createElement('a');
+        link.download = generateFileName(fileName);
+        const imageData = canvas.toDataURL('image/png');
+        const blob = dataURItoBlob(imageData);
+        link.href = URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        
+        setTimeout(() => {
+            link.click();
+            document.body.removeChild(link);
+        }, 10);
+    };
+
+    const downloadAllPic = () => {
+        allCanvas.forEach(({ canvas, fileName }) => {
+            downloadCanvasAsImage(canvas, fileName);
+        });
+    };
+
+    const clearAll = () => {
+        allCanvas = [];
+        $('#graph').innerHTML = `
+            <div class="empty-state">
+                <span class="material-icons-round">image</span>
+                <p>暂无图片，请从左侧上传</p>
+            </div>
+        `;
+        $('#image').value = '';
+        updateUI();
+        updateGridLayout(); // 重置网格布局
+    };
+
+    const updateUI = () => {
+        const count = allCanvas.length;
+        const fileCount = $('#file-count');
+        const previewStats = $('#preview-stats');
+        const downloadBtn = $('#download-all-btn');
+        
+        if (count > 0) {
+            fileCount.textContent = `${count} 个文件`;
+            fileCount.style.color = 'var(--primary-purple)';
+            previewStats.textContent = `${count} 张图片`;
+            downloadBtn.disabled = false;
+        } else {
+            fileCount.textContent = '未选择文件';
+            fileCount.style.color = 'var(--text-secondary)';
+            previewStats.textContent = '0 张图片';
+            downloadBtn.disabled = true;
+        }
+    };
+
+    // 初始化输入
+    inputItems.forEach(item => {
+        const el = $('#' + item);
+        configInputSetting[item] = el;
+        
+        el.addEventListener('input', () => {
+            if (item === 'color') {
+                $('#color-value').textContent = el.value.toUpperCase();
+            }
+            
+            allCanvas.forEach(({ canvas, img }) => {
+                drawText(canvas, img);
+            });
+            updateGridDisplay();
+        });
+    });
+
+    const updateGridDisplay = () => {
+        const cards = document.querySelectorAll('.image-card');
+        allCanvas.forEach((item, index) => {
+            if (cards[index]) {
+                const wrapper = cards[index].querySelector('.canvas-wrapper');
+                const oldCanvas = wrapper.querySelector('canvas');
+                const newCanvas = document.createElement('canvas');
+                newCanvas.width = item.canvas.width;
+                newCanvas.height = item.canvas.height;
+                newCanvas.getContext('2d').drawImage(item.canvas, 0, 0);
+                wrapper.replaceChild(newCanvas, oldCanvas);
+            }
+        });
+    };
+
+    // 文件上传处理
+    $('#image').addEventListener('change', function() {
+        [...this.files].forEach(file => {
+            if (!['image/png', 'image/jpeg', 'image/gif'].includes(file.type)) {
+                alert('仅支持 PNG、JPG、GIF 格式');
+                return;
+            }
+            readFile(file);
+        });
+    });
+
+    // 拖拽上传
+    const uploadBox = $('.file-upload-box');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadBox.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
+    });
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadBox.addEventListener(eventName, () => {
+            uploadBox.style.borderColor = 'var(--primary-purple)';
+            uploadBox.style.background = 'var(--bg-lavender)';
+        }, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadBox.addEventListener(eventName, () => {
+            uploadBox.style.borderColor = 'var(--primary-purple-light)';
+            uploadBox.style.background = 'var(--bg-lavender-light)';
+        }, false);
+    });
+    
+    uploadBox.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        $('#image').files = files;
+        [...files].forEach(file => {
+            if (!['image/png', 'image/jpeg', 'image/gif'].includes(file.type)) {
+                alert('仅支持 PNG、JPG、GIF 格式');
+                return;
+            }
+            readFile(file);
+        });
+    });
+</script>
+
+</body>
+</html>
